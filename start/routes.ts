@@ -76,4 +76,4 @@ Route.delete('/favoritos/:id', async ({ params, response }) => {
   return response.status(204)
 })
 
-Route.resource('favoritos', 'FavoritosController').apiOnly()
+Route.resource('favoritao', 'FavoritosController').apiOnly()
