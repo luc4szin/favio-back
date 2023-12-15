@@ -37,6 +37,7 @@ Route.get('/favoritos/:id', async ({ params, response }) => {
   }
   return favoritoEncontrado
 })
+
 // Procura favorito pelo nome
 Route.get('/favoritos/:nome', async ({ params }) => {
   return { id: 1, nome: params.nome, url: 'https://www.google.com', importante: true }
@@ -50,4 +51,29 @@ Route.post('/favoritos', async ({ request, response }) => {
   return response.status(201).send(newFavorito)
 })
 
-Route.resource('favoritao', 'FavoritosController').apiOnly()
+//Rota put para atualizar favorito pelo id
+Route.put('/favoritos/:id', async ({ request, params, response }) => {
+  const { nome, url, importante } = request.body()
+  let favoritoEncontrado = favoritos.find((favorito) => favorito.id == params.id)
+  if (!favoritoEncontrado) {
+    return response.status(404)
+  }
+  favoritoEncontrado.nome = nome
+  favoritoEncontrado.url = url
+  favoritoEncontrado.importante = importante
+
+  favoritos[params.id] = favoritoEncontrado
+  return response.status(200).send(favoritoEncontrado)
+})
+
+//Rota delete para apagar favorito pelo id
+Route.delete('/favoritos/:id', async ({ params, response }) => {
+  let favoritoEncontrado = favoritos.find((favorito) => favorito.id == params.id)
+  if (!favoritoEncontrado) {
+    return response.status(404)
+  }
+  favoritos.splice(favoritos.indexOf(favoritoEncontrado), 1)
+  return response.status(204)
+})
+
+Route.resource('favoritos', 'FavoritosController').apiOnly()

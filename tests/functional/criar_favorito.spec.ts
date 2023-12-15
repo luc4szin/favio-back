@@ -14,5 +14,6 @@ test.group('Criar favorito', () => {
     const resposta = await client.post('/favoritos').json({ nome: 'IFRN' })
 
     resposta.assertStatus(201)
+    resposta.assertBodyContains({ nome: 'IFRN' })
   })
 })
