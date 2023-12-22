@@ -38,7 +38,7 @@ Route.get('/favoritos/:id', async ({ params, response }) => {
   return favoritoEncontrado
 })
 
-// Procura favorito pelo nome
+// Rota get que procura favorito pelo nome
 Route.get('/favoritos/:nome', async ({ params }) => {
   return { id: 1, nome: params.nome, url: 'https://www.google.com', importante: true }
 })

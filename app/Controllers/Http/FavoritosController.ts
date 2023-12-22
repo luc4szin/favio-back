@@ -1,21 +1,21 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-
-let favoritos = [{ id: 1, nome: 'Google', url: 'https://www.google.com.br', importante: true }]
+import Favorito from 'App/Models/Favorito'
+import { DateTime } from 'luxon'
 
 export default class FavoritosController {
   public async index({}: HttpContextContract) {
-    return favoritos
+    return Favorito.all()
   }
 
   public async store({ request, response }: HttpContextContract) {
     const { nome, url, importante } = request.body()
-    const newFavorito = { id: favoritos.length + 1, nome, url, importante }
-    favoritos.push(newFavorito)
+    const newFavorito = { nome, url, importante }
+    Favorito.create(newFavorito)
     return response.status(201).send(newFavorito)
   }
 
   public async show({ params, response }: HttpContextContract) {
-    let favoritoEncontrado = favoritos.find((favorito) => favorito.id == params.id)
+    let favoritoEncontrado = Favorito.findByOrFail('id', params.id)
     if (favoritoEncontrado == undefined) {
       return response.status(404)
     }
@@ -24,24 +24,24 @@ export default class FavoritosController {
 
   public async update({ request, params, response }: HttpContextContract) {
     const { nome, url, importante } = request.body()
-    let favoritoEncontrado = favoritos.find((favorito) => favorito.id == params.id)
+    let favoritoEncontrado = await Favorito.findByOrFail('id', params.id)
     if (!favoritoEncontrado) {
       return response.status(404)
     }
     favoritoEncontrado.nome = nome
     favoritoEncontrado.url = url
     favoritoEncontrado.importante = importante
-
-    favoritos[params.id] = favoritoEncontrado
+    ;(await favoritoEncontrado).save()
+    ;(await favoritoEncontrado).merge({ updatedAt: DateTime.local() })
     return response.status(200).send(favoritoEncontrado)
   }
 
   public async destroy({ params, response }: HttpContextContract) {
-    let favoritoEncontrado = favoritos.find((favorito) => favorito.id == params.id)
+    let favoritoEncontrado = await Favorito.findByOrFail('id', params.id)
     if (!favoritoEncontrado) {
       return response.status(404)
     }
-    favoritos.splice(favoritos.indexOf(favoritoEncontrado), 1)
+    favoritoEncontrado.delete()
     return response.status(204)
   }
 }
